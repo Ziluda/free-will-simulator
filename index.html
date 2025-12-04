@@ -437,7 +437,7 @@ function allActions() {
         {id: "mediate_dispute", label: "Relations: mediate a dispute",           domain: "relations", moral: "good",    v:  0.6, effort: 0.7},
         {id: "shun_outsider",   label: "Relations: shun an outsider to fit in",  domain: "relations", moral: "bad",     v: -0.5, effort: 0.4},
 
-        {id: "keep_ritual",          label: "Meaning: keep a shared ritual carefully",        domain: "meaning", moral: "good",    v:  0.5, effort: 0.5},
+        {id: "engage_ritual",        label: "Meaning: engage in a shared ritual with kin",        domain: "meaning", moral: "good",    v:  0.5, effort: 0.5},
         {id: "break_ritual",         label: "Meaning: deliberately break a shared ritual",    domain: "meaning", moral: "bad",     v: -0.5, effort: 0.4},
         {id: "offer_gift",           label: "Meaning: offer a gift to something unseen",      domain: "meaning", moral: "good",    v:  0.4, effort: 0.4},
         {id: "hoard_offering",       label: "Meaning: keep back what was promised",           domain: "meaning", moral: "bad",     v: -0.4, effort: 0.3},
@@ -810,7 +810,7 @@ function onAction(actionId) {
         case "shun_outsider":
             outcomeText = "You do not welcome an outsider into your group. Your group does not approve of your aloof behaviour.";
             break;
-        case "keep_ritual":
+        case "engage_ritual":
             outcomeText = "You engage in a shared ritual. This creates a sense of comfort and relaxation within the group.";
             break;
         case "break_ritual":
