@@ -403,11 +403,9 @@ function introText() {
     }
 }
 
-// 3 domains: survival, relations, meaning
-// moral: "good" | "neutral" | "bad"
+
 function allActions() {
     return [
-        // SURVIVAL
         {id: "forage_hunt",    label: "Survival: forage / hunt for food",      domain: "survival", moral: "good",    v:  0.3, effort: 0.6},
         {id: "rest",           label: "Survival: rest by the fire",            domain: "survival", moral: "neutral", v:  0.0, effort: 0.1},
         {id: "build_shelter",  label: "Survival: build or reinforce shelter",  domain: "survival", moral: "good",    v:  0.4, effort: 0.7},
@@ -419,7 +417,6 @@ function allActions() {
         {id: "steal_tools",    label: "Survival: quietly steal someone's tool",domain: "survival", moral: "bad",     v: -0.6, effort: 0.3},
         {id: "waste_resources",label: "Survival: waste scarce resources",      domain: "survival", moral: "bad",     v: -0.5, effort: 0.2},
 
-        // RELATIONS (kinship + language/community)
         {id: "aid_kin",        label: "Relations: aid your kin",                 domain: "relations", moral: "good",    v:  0.6, effort: 0.6},
         {id: "share_fire",     label: "Relations: share the fire with kin",      domain: "relations", moral: "good",    v:  0.3, effort: 0.4},
         {id: "comfort_kin",    label: "Relations: comfort a grieving kin",       domain: "relations", moral: "good",    v:  0.5, effort: 0.5},
@@ -440,7 +437,6 @@ function allActions() {
         {id: "mediate_dispute", label: "Relations: mediate a dispute",           domain: "relations", moral: "good",    v:  0.6, effort: 0.7},
         {id: "shun_outsider",   label: "Relations: shun an outsider to fit in",  domain: "relations", moral: "bad",     v: -0.5, effort: 0.4},
 
-        // MEANING (ritual, taboo, inner stance)
         {id: "keep_ritual",          label: "Meaning: keep a shared ritual carefully",        domain: "meaning", moral: "good",    v:  0.5, effort: 0.5},
         {id: "break_ritual",         label: "Meaning: deliberately break a shared ritual",    domain: "meaning", moral: "bad",     v: -0.5, effort: 0.4},
         {id: "offer_gift",           label: "Meaning: offer a gift to something unseen",      domain: "meaning", moral: "good",    v:  0.4, effort: 0.4},
@@ -453,7 +449,6 @@ function allActions() {
     ];
 }
 
-// EXACT one good, one neutral, one bad (if possible)
 function pickBalancedActions(candidates) {
     const goods   = candidates.filter(a => a.moral === "good");
     const neutrals= candidates.filter(a => a.moral === "neutral");
@@ -472,12 +467,10 @@ function pickBalancedActions(candidates) {
         return a;
     }
 
-    // Try to get one of each
     pickFrom(goods);
     pickFrom(neutrals);
     pickFrom(bads);
 
-    // If any category was empty (after filters), fill from remaining actions
     const needed = 3 - result.length;
     if (needed > 0) {
         const leftover = candidates.filter(a => !usedIds.has(a.id));
@@ -526,7 +519,6 @@ function availableActionsForTurn() {
         writeTerminal(relationalMessage, false);
     }
 
-    // cooldown: avoid very recent actions if possible
     filtered = filtered.filter(a => !recentSet.has(a.id));
     if (filtered.length < 3) {
         filtered = actions.slice();
@@ -734,7 +726,6 @@ function onAction(actionId) {
 
     let outcomeText;
     switch (action.id) {
-        // Survival
         case "forage_hunt":
             outcomeText = "You search for food with confidence and skill. Your community appreciates and relies on your effort.";
             break;
@@ -765,8 +756,6 @@ function onAction(actionId) {
         case "waste_resources":
             outcomeText = "You use more than you need, letting precious and scarce resources go to waste.";
             break;
-
-        // Relations
         case "aid_kin":
             outcomeText = "You help your kin with a task. You grow closer as trust builds.";
             break;
@@ -821,8 +810,6 @@ function onAction(actionId) {
         case "shun_outsider":
             outcomeText = "You do not welcome an outsider into your group. Your group does not approve of your aloof behaviour.";
             break;
-
-        // Meaning
         case "keep_ritual":
             outcomeText = "You engage in a shared ritual. This creates a sense of comfort and relaxation within the group.";
             break;
@@ -947,7 +934,6 @@ function startSim() {
     const modeSelect = document.getElementById("mode-select");
     const mode = modeSelect.value;
     initState(mode);
-    // Let renderTurn handle the intro; avoid double-printing introText
     renderTurn(true);
 }
 
