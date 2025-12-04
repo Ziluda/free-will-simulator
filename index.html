@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Metaphysics Simulator</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Code+Latin:wght@100..700&family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --green-dark: #2F5249;
+            --green-mid:  #437057;
+            --green-soft: #97B067;
+            --yellow-soft:#E3DE61;
+            --blue-soft: #91C4C3;
+
+            --bg-page:   #0B1411;
+            --bg-shell:  #111815;
+            --bg-panel:  #151F1A;
+            --bg-code:   #050806;
+            --text-main: #F5F5F2;
+            --text-muted:#A8B4A8;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Quantico", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 24px 12px;
+            background: linear-gradient(
+                to bottom,
+                #2F5249 0%,
+                #2F5249 20%,
+                #437057 60%,
+                #97B067 100%
+            );
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #wrapper {
+            max-width: 900px;
+            width: 100%;
+            background: var(--bg-shell);
+            border-radius: 12px;
+            border: 1px solid var(--green-dark);
+            padding: 20px 20px 18px;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.4);
+        }
+
+        h1 {
+            margin: 0 0 8px 0;
+            font-size: 1.6rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--yellow-soft);
+        }
+
+        h2 {
+            margin: 0 0 0 0;
+            font-size: 1rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--blue-soft);
+        }
+
+        #info {
+            background: var(--bg-panel);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            color: var(--text-muted);
+        }
+
+        #info strong,
+        #info b {
+            color: var(--green-soft);
+        }
+
+        #top-bar {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        #top-bar label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+        }
+
+        #turn-label {
+            font-size: 0.85rem;
+            color: var(--yellow-soft);
+            opacity: 0.9;
+        }
+
+        #terminal {
+            background: var(--bg-code);
+            border-radius: 8px;
+            padding: 10px 12px;
+            min-height: 260px;
+            white-space: pre-wrap;
+            font-family: "M PLUS Code Latin", monospace;
+            font-size: 0.88rem;
+            line-height: 1.4;
+            overflow-y: auto;
+            border: 1px solid var(--green-dark);
+        }
+
+        #bottom {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        #meters,
+        #actions {
+            flex: 1;
+            background: var(--bg-panel);
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 0.85rem;
+            border: 1px solid #1c2922;
+        }
+
+        #meters > div {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .label {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .metric {
+            font-weight: 700;
+            color: var(--green-soft);
+        }
+
+        button.action-btn {
+            display: block;
+            width: 100%;
+            margin: 4px 0;
+            padding: 7px 8px;
+            background: var(--green-dark);
+            border: 1px solid transparent;
+            border-radius: 6px;
+            color: var(--text-main);
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.86rem;
+            line-height: 1.3;
+            transition: background 120ms ease-out, border-color 120ms ease-out, transform 80ms ease-out;
+        }
+
+        button.action-btn:hover {
+            background: var(--green-mid);
+            border-color: var(--yellow-soft);
+        }
+
+        button.action-btn:active {
+            transform: translateY(1px);
+        }
+
+        button#start-btn {
+            padding: 6px 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 0.8rem;
+            background: #1b2721;
+            border-radius: 999px;
+        }
+
+        select,
+        button {
+            background: #18231e;
+            color: var(--text-main);
+            border-radius: 6px;
+            border: 1px solid var(--green-dark);
+            padding: 4px 8px;
+            font-family: inherit;
+        }
+
+        select:focus,
+        button:focus-visible {
+            outline: 1px solid var(--yellow-soft);
+            outline-offset: 2px;
+        }
+
+        #actions > div:first-child {
+            margin-bottom: 4px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+
+        #actions > div:first-child b {
+            color: var(--green-soft);
+            font-weight: 700;
+        }
+
+        #debug-controls {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #debug-controls input[type="checkbox"] {
+            accent-color: var(--green-soft);
+        }
+
+        #debug-panel {
+            display: none;
+            margin-top: 6px;
+            background: #0d1612;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-family: "M PLUS Code Latin", monospace;
+            font-size: 0.8rem;
+            white-space: pre-wrap;
+            border: 1px solid #1e3028;
+            color: #c9d1c9;
+        }
+
+        @media (max-width: 720px) {
+            #wrapper {
+                padding: 16px 14px 14px;
+            }
+
+            #bottom {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+</head>
+<body>
+<div id="wrapper">
+    <h1>Free Will Simulator</h1>
+
+    <div id="info">
+        <h2>Modes</h2><br>
+        <b>Indeterminism</b>: outcomes are driven mostly by randomness; your choices are recorded but do not systematically change your future options or freedom.<br>
+        <b>Relational compatibilism</b>: your choices and others' behaviour affect your future options, your moral record, and how free you are.<br>
+        <b>Determinism</b>: at each step there is only one available option; given the starting conditions, nothing could have gone otherwise.<br><br>
+        <h2>Scores</h2><br>
+        <b>Karma (K)</b>: a running moral ledger of <em>your</em> actions (aid vs exploit) over time. Only your choices change K.<br>
+        <b>Luck / Unluck (L/U)</b>: random or relational events (others' responses, circumstances) that make life easier or harder.<br>
+        <b>ADO (Ability to Do Otherwise)</b>: how many real alternatives you had at this step, based on how balanced the model thinks your options are (0 = close to none, 1 = multiple available options).
+    </div>
+
+    <div id="top-bar">
+        <label for="mode-select">Mode:</label>
+        <select id="mode-select">
+            <option value="indet">Indeterminism</option>
+            <option value="compat" selected>Relational compatibilism</option>
+            <option value="det">Determinism</option>
+        </select>
+        <button id="start-btn">Start / Restart</button>
+        <span id="turn-label" style="margin-left:auto;"></span>
+    </div>
+
+    <div id="terminal"></div>
+
+    <div id="bottom">
+        <div id="meters"></div>
+        <div id="actions"></div>
+    </div>
+
+    <div id="debug-controls">
+        <label>
+            <input type="checkbox" id="debug-toggle">
+            Show background calculations (karma, luck/unluck, ADO)
+        </label>
+    </div>
+    <div id="debug-panel"></div>
+</div>
+
+<script>
+const MAX_TURNS = 10;
+const RECENT_MEMORY = 3;
+
+const state = {
+    mode: "compat",
+    turn: 0,
+    finished: false,
+    karma: 0.0,
+    luck: 0.0,
+    unluck: 0.0,
+    ado: 0.0,
+    log: [],
+    detPath: [],
+    currentActions: [],
+    currentProbs: [],
+    debug: false,
+    lastDebug: "",
+    recentActions: []
+};
+
+function writeTerminal(text, reset=false) {
+    const term = document.getElementById("terminal");
+    if (reset) {
+        term.innerText = text;
+    } else {
+        term.innerText += "\n" + text;
+    }
+    term.scrollTop = term.scrollHeight;
+}
+
+function updateMeters() {
+    const meters = document.getElementById("meters");
+    meters.innerHTML =
+        `<div><span class="label">Karma (K): </span>
+         <span class="metric">${state.karma.toFixed(2)}</span></div>
+         <div><span class="label">Luck (L): </span>
+         <span class="metric">${state.luck.toFixed(2)}</span></div>
+         <div><span class="label">Unluck (U): </span>
+         <span class="metric">${state.unluck.toFixed(2)}</span></div>
+         <div><span class="label">Ability to Do Otherwise (ADO): </span>
+         <span class="metric">${state.ado.toFixed(2)}</span></div>`;
+
+    const label = document.getElementById("turn-label");
+    if (state.finished) {
+        label.innerText = "Simulation complete";
+    } else if (state.turn === 0) {
+        label.innerText = "";
+    } else {
+        label.innerText = `Turn ${state.turn} / ${MAX_TURNS}`;
+    }
+
+    if (state.debug) {
+        const panel = document.getElementById("debug-panel");
+        panel.innerText = state.lastDebug || "No action taken yet.";
+    }
+}
+
+function initState(mode) {
+    state.mode = mode;
+    state.turn = 0;
+    state.finished = false;
+    state.karma = 0.0;
+    state.luck = 0.0;
+    state.unluck = 0.0;
+    state.ado = 0.0;
+    state.log = [];
+    state.currentActions = [];
+    state.currentProbs = [];
+    state.lastDebug = "";
+    state.recentActions = [];
+
+    if (mode === "det") {
+        state.detPath = [
+            "forage_hunt",
+            "ignore_kin",
+            "break_ritual",
+            "build_shelter",
+            "exploit_kin",
+            "distort_lie",
+            "share_food",
+            "shun_outsider",
+            "desecrate_sacred_place",
+            "rest"
+        ];
+    } else {
+        state.detPath = [];
+    }
+}
+
+function introText() {
+    const m = state.mode;
+    if (m === "indet") {
+        return "You enter an indeterministic world.\n" +
+               "Your choices are recorded, but outcomes and circumstances are dominated by randomness.\n" +
+               "The universe does not 'remember' your past in a way that reshapes your future freedom.\n";
+    } else if (m === "compat") {
+        return "You enter a relational compatibilist world.\n" +
+               "Your actions and simple social feedback will shape your moral record,\n" +
+               "your future options, and how free you are at each turn.\n";
+    } else {
+        return "You enter a deterministic world.\n" +
+               "At each step there is only one available option. Given the starting conditions,\n" +
+               "nothing could have gone otherwise.\n";
+    }
+}
+
+// 3 domains: survival, relations, meaning
+// moral: "good" | "neutral" | "bad"
+function allActions() {
+    return [
+        // SURVIVAL
+        {id: "forage_hunt",    label: "Survival: forage / hunt for food",      domain: "survival", moral: "good",    v:  0.3, effort: 0.6},
+        {id: "rest",           label: "Survival: rest by the fire",            domain: "survival", moral: "neutral", v:  0.0, effort: 0.1},
+        {id: "build_shelter",  label: "Survival: build or reinforce shelter",  domain: "survival", moral: "good",    v:  0.4, effort: 0.7},
+        {id: "share_food",     label: "Survival: share gathered food",         domain: "survival", moral: "good",    v:  0.5, effort: 0.5},
+        {id: "hoard_food",     label: "Survival: hoard gathered food",         domain: "survival", moral: "bad",     v: -0.4, effort: 0.4},
+        {id: "sabotage_hunt",  label: "Survival: sabotage another's hunt",     domain: "survival", moral: "bad",     v: -0.7, effort: 0.5},
+        {id: "repair_tools",   label: "Survival: repair tools for the group",  domain: "survival", moral: "good",    v:  0.5, effort: 0.6},
+        {id: "risky_hunt",     label: "Survival: attempt a risky lone hunt",   domain: "survival", moral: "neutral", v:  0.1, effort: 0.8},
+        {id: "steal_tools",    label: "Survival: quietly steal someone's tool",domain: "survival", moral: "bad",     v: -0.6, effort: 0.3},
+        {id: "waste_resources",label: "Survival: waste scarce resources",      domain: "survival", moral: "bad",     v: -0.5, effort: 0.2},
+
+        // RELATIONS (kinship + language/community)
+        {id: "aid_kin",        label: "Relations: aid your kin",                 domain: "relations", moral: "good",    v:  0.6, effort: 0.6},
+        {id: "share_fire",     label: "Relations: share the fire with kin",      domain: "relations", moral: "good",    v:  0.3, effort: 0.4},
+        {id: "comfort_kin",    label: "Relations: comfort a grieving kin",       domain: "relations", moral: "good",    v:  0.5, effort: 0.5},
+        {id: "ignore_kin",     label: "Relations: ignore your kin",              domain: "relations", moral: "bad",     v: -0.2, effort: 0.2},
+        {id: "mock_kin",       label: "Relations: mock a struggling kin",        domain: "relations", moral: "bad",     v: -0.3, effort: 0.3},
+        {id: "exploit_kin",    label: "Relations: exploit your kin",             domain: "relations", moral: "bad",     v: -0.6, effort: 0.5},
+        {id: "listen_kin",     label: "Relations: listen patiently to a kin",    domain: "relations", moral: "good",    v:  0.4, effort: 0.3},
+        {id: "protect_kin",    label: "Relations: stand up for a kin",           domain: "relations", moral: "good",    v:  0.6, effort: 0.7},
+        {id: "gossip_kin",     label: "Relations: gossip negatively about kin",  domain: "relations", moral: "bad",     v: -0.4, effort: 0.3},
+
+        {id: "teach_word",      label: "Relations: teach a useful word",         domain: "relations", moral: "good",    v:  0.5, effort: 0.4},
+        {id: "share_story",     label: "Relations: share the story of the day",  domain: "relations", moral: "good",    v:  0.4, effort: 0.5},
+        {id: "create_signal",   label: "Relations: create a shared signal",      domain: "relations", moral: "good",    v:  0.25, effort: 0.3},
+        {id: "withhold_info",   label: "Relations: withhold useful info",        domain: "relations", moral: "bad",     v: -0.2, effort: 0.3},
+        {id: "spread_rumor",    label: "Relations: spread a rumor",              domain: "relations", moral: "bad",     v: -0.5, effort: 0.4},
+        {id: "distort_lie",     label: "Relations: distort meaning / lie",       domain: "relations", moral: "bad",     v: -0.7, effort: 0.5},
+        {id: "ridicule_speech", label: "Relations: ridicule someone's speech",   domain: "relations", moral: "bad",     v: -0.4, effort: 0.3},
+        {id: "mediate_dispute", label: "Relations: mediate a dispute",           domain: "relations", moral: "good",    v:  0.6, effort: 0.7},
+        {id: "shun_outsider",   label: "Relations: shun an outsider to fit in",  domain: "relations", moral: "bad",     v: -0.5, effort: 0.4},
+
+        // MEANING (ritual, taboo, inner stance)
+        {id: "keep_ritual",          label: "Meaning: keep a shared ritual carefully",        domain: "meaning", moral: "good",    v:  0.5, effort: 0.5},
+        {id: "break_ritual",         label: "Meaning: deliberately break a shared ritual",    domain: "meaning", moral: "bad",     v: -0.5, effort: 0.4},
+        {id: "offer_gift",           label: "Meaning: offer a gift to something unseen",      domain: "meaning", moral: "good",    v:  0.4, effort: 0.4},
+        {id: "hoard_offering",       label: "Meaning: keep back what was promised",           domain: "meaning", moral: "bad",     v: -0.4, effort: 0.3},
+        {id: "contemplate_mortality",label: "Meaning: contemplate your own mortality",        domain: "meaning", moral: "neutral", v:  0.0, effort: 0.3},
+        {id: "create_art_symbol",    label: "Meaning: carve or paint a symbol",               domain: "meaning", moral: "good",    v:  0.4, effort: 0.5},
+        {id: "desecrate_sacred_place",label: "Meaning: deface a place others treat as sacred",domain: "meaning", moral: "bad",     v: -0.7, effort: 0.5},
+        {id: "reflect_on_choice",    label: "Meaning: quietly reflect on your recent choices",domain: "meaning", moral: "good",    v:  0.3, effort: 0.2},
+        {id: "numb_out",             label: "Meaning: distract yourself so you feel nothing", domain: "meaning", moral: "bad",     v: -0.3, effort: 0.1}
+    ];
+}
+
+// EXACT one good, one neutral, one bad (if possible)
+function pickBalancedActions(candidates) {
+    const goods   = candidates.filter(a => a.moral === "good");
+    const neutrals= candidates.filter(a => a.moral === "neutral");
+    const bads    = candidates.filter(a => a.moral === "bad");
+
+    const result = [];
+    const usedIds = new Set();
+
+    function pickFrom(list) {
+        if (!list || list.length === 0) return null;
+        const idx = Math.floor(Math.random() * list.length);
+        const a = list[idx];
+        if (usedIds.has(a.id)) return null;
+        result.push(a);
+        usedIds.add(a.id);
+        return a;
+    }
+
+    // Try to get one of each
+    pickFrom(goods);
+    pickFrom(neutrals);
+    pickFrom(bads);
+
+    // If any category was empty (after filters), fill from remaining actions
+    const needed = 3 - result.length;
+    if (needed > 0) {
+        const leftover = candidates.filter(a => !usedIds.has(a.id));
+        while (result.length < 3 && leftover.length > 0) {
+            const idx = Math.floor(Math.random() * leftover.length);
+            const a = leftover.splice(idx, 1)[0];
+            result.push(a);
+            usedIds.add(a.id);
+        }
+    }
+    return result;
+}
+
+function availableActionsForTurn() {
+    const m = state.mode;
+    const actions = allActions();
+    const recentSet = new Set(state.recentActions);
+
+    if (m === "det") {
+        const idx = Math.min(state.turn - 1, state.detPath.length - 1);
+        const forcedId = state.detPath[idx];
+        return [actions.find(a => a.id === forcedId)];
+    }
+
+    let filtered = actions.slice();
+    let relationalMessage = "";
+
+    if (m === "compat") {
+        if (state.unluck > 0.7) {
+            const hadAid = filtered.some(a => a.id === "aid_kin");
+            filtered = filtered.filter(a => a.id !== "aid_kin" && a.id !== "comfort_kin");
+            if (hadAid) {
+                relationalMessage = "Your kin feel distant; actively caring for them no longer feels like a real possibility.\n";
+            }
+        }
+        if (state.unluck > 1.0) {
+            const hadTeach = filtered.some(a => a.id === "teach_word");
+            filtered = filtered.filter(a => a.id !== "teach_word" && a.id !== "share_story");
+            if (hadTeach) {
+                relationalMessage += "Shared narratives have frayed; teaching and storytelling no longer feel available.\n";
+            }
+        }
+    }
+
+    if (relationalMessage) {
+        writeTerminal(relationalMessage, false);
+    }
+
+    // cooldown: avoid very recent actions if possible
+    filtered = filtered.filter(a => !recentSet.has(a.id));
+    if (filtered.length < 3) {
+        filtered = actions.slice();
+    }
+
+    return pickBalancedActions(filtered);
+}
+
+function computePolicyProbs(actions) {
+    const m = state.mode;
+    const n = actions.length;
+    if (n === 0) return [];
+
+    if (m === "det") {
+        const probs = new Array(n).fill(0);
+        probs[0] = 1;
+        return probs;
+    }
+
+    if (m === "indet") {
+        return new Array(n).fill(1 / n);
+    }
+
+    const k = state.karma;
+    const U = state.unluck;
+    const scores = [];
+
+    for (const a of actions) {
+        const v = a.v;
+        let base = 1.0;
+
+        base += 0.8 * k * v;
+        if (v > 0) base -= 0.4 * U;
+        if (v < 0) base += 0.2 * U;
+
+        base = Math.max(base, 0.05);
+        scores.push(base);
+    }
+
+    const total = scores.reduce((a, b) => a + b, 0);
+    return scores.map(s => s / total);
+}
+
+function computeAdo(actions, probs) {
+    const n = actions.length;
+    if (n <= 1) return 0.0;
+
+    let H = 0.0;
+    for (const p of probs) {
+        if (p > 0) H -= p * Math.log(p);
+    }
+    const Hmax = Math.log(n);
+    if (Hmax === 0) return 0.0;
+    return H / Hmax;
+}
+
+function updateKarmaLuckUnluck(action) {
+    const v = action.v;
+    const effort = action.effort;
+    const lam = 0.9;
+    const alpha = 0.6;
+    const beta = 0.5;
+
+    state.karma = lam * state.karma + alpha * (v * (1 + beta * effort));
+
+    const m = state.mode;
+
+    if (m === "indet") {
+        const ell = randn(0, 0.4);
+        const mu = 0.7;
+        if (ell >= 0) {
+            state.luck   = mu * state.luck   + ell;
+            state.unluck = mu * state.unluck;
+        } else {
+            state.unluck = mu * state.unluck + (-ell);
+            state.luck   = mu * state.luck;
+        }
+    } else if (m === "compat") {
+        let ell = randn(0, 0.25);
+        ell += 0.2 * v;
+        ell += 0.1 * state.karma;
+
+        const mu = 0.7;
+        if (ell >= 0) {
+            state.luck   = mu * state.luck   + ell;
+            state.unluck = mu * state.unluck;
+        } else {
+            state.unluck = mu * state.unluck + (-ell);
+            state.luck   = mu * state.luck;
+        }
+    } else {
+        const mu = 0.85;
+        if (state.karma >= 0) {
+            state.luck   = mu * state.luck   + 0.1;
+            state.unluck = mu * state.unluck;
+        } else {
+            state.unluck = mu * state.unluck + 0.1;
+            state.luck   = mu * state.luck;
+        }
+    }
+}
+
+function describeTurnIntro() {
+    const k = state.karma;
+    const L = state.luck;
+    const U = state.unluck;
+
+    let base = "Dawn breaks over a sparse valley. ";
+    if (L > U + 0.4) {
+        base += "Today feels unusually favorable; small things seem to go your way.\n";
+    } else if (U > L + 0.4) {
+        base += "Today feels unusually difficult; minor setbacks keep appearing.\n";
+    } else {
+        base += "The day feels ordinary; neither especially bright nor dull.\n";
+    }
+
+    if (k > 0.7) {
+        base += "You carry a sense of gratitude for having acted well in the past.\n";
+    } else if (k < -0.7) {
+        base += "You carry a subtle heaviness of past choices.\n";
+    }
+    return base;
+}
+
+function renderTurn(reset=false) {
+    if (state.finished) return;
+
+    state.turn += 1;
+    if (state.turn > MAX_TURNS) {
+        finishSim();
+        return;
+    }
+
+    if (state.turn === 1) {
+        const text = introText() + "\n" + describeTurnIntro();
+        writeTerminal(text, true);
+    } else {
+        writeTerminal("\n" + describeTurnIntro(), false);
+    }
+
+    const actions = availableActionsForTurn();
+    state.currentActions = actions;
+
+    const probs = computePolicyProbs(actions);
+    state.currentProbs = probs;
+    state.ado = computeAdo(actions, probs);
+
+    const actionsDiv = document.getElementById("actions");
+    let header;
+    if (state.mode === "det") {
+        header = "<div><b>Deterministic step:</b> given the past and the laws of nature, you have no choice about what happens next:</div>";
+    } else if (state.mode === "indet") {
+        header = "<div><b>Indeterministic menu:</b> typically one good, one neutral, and one bad option are available; your choice is free, but chance governs how the world responds and does not reshape your future freedom.</div>";
+    } else {
+        header = "<div><b>Relational menu:</b> you face a good, neutral, and bad option which will shape your future freedom.</div>";
+    }
+
+    let html = header;
+    for (const a of actions) {
+        html += `<button class="action-btn" onclick="onAction('${a.id}')">${a.label}</button>`;
+    }
+    actionsDiv.innerHTML = html;
+
+    updateMeters();
+}
+
+function onAction(actionId) {
+    if (state.finished) return;
+    const actions = state.currentActions;
+    if (!actions || actions.length === 0) return;
+
+    let action = actions.find(a => a.id === actionId);
+
+    if (state.mode === "det") {
+        const idx = Math.min(state.turn - 1, state.detPath.length - 1);
+        const forcedId = state.detPath[idx];
+        action = actions.find(a => a.id === forcedId);
+    }
+
+    if (!action) return;
+
+    state.recentActions.push(action.id);
+    if (state.recentActions.length > RECENT_MEMORY) {
+        state.recentActions.shift();
+    }
+
+    const K_before = state.karma;
+    const L_before = state.luck;
+    const U_before = state.unluck;
+    const ado_before = state.ado;
+    const probs = state.currentProbs || [];
+
+    state.log.push({
+        turn: state.turn,
+        action: action.id,
+        domain: action.domain,
+        moral: action.moral,
+        v: action.v,
+        effort: action.effort,
+        karma_before: K_before,
+        luck_before: L_before,
+        unluck_before: U_before,
+        ado: ado_before
+    });
+
+    let outcomeText;
+    switch (action.id) {
+        // Survival
+        case "forage_hunt":
+            outcomeText = "You search for food with confidence and skill. Your community appreciates and relies on your effort.";
+            break;
+        case "rest":
+            outcomeText = "You sit by the fire for a bit and let the day pass. Nothing is repaired, nothing falls apart either.";
+            break;
+        case "build_shelter":
+            outcomeText = "You work on building a shelter, aiding your kin by ensuring their safety.";
+            break;
+        case "share_food":
+            outcomeText = "You share your food with your kin. They are grateful for your kindness.";
+            break;
+        case "hoard_food":
+            outcomeText = "You stash extra food away for yourself. Greed keeps your future secure, others notice and remain silent, but not for long.";
+            break;
+        case "sabotage_hunt":
+            outcomeText = "You sabotage another's hunt stealing their bounty and earn praise from your kin. Their failure will be blamed on chance.";
+            break;
+        case "repair_tools":
+            outcomeText = "You repair workers' tools, aiding in overall growth of the community.";
+            break;
+        case "risky_hunt":
+            outcomeText = "You go out on a hunt alone and unprepared, but the fruits could be plentiful.";
+            break;
+        case "steal_tools":
+            outcomeText = "You steal someone else's tools. They will struggle later leading to wasted time.";
+            break;
+        case "waste_resources":
+            outcomeText = "You use more than you need, letting precious and scarce resources go to waste.";
+            break;
+
+        // Relations
+        case "aid_kin":
+            outcomeText = "You help your kin with a task. You grow closer as trust builds.";
+            break;
+        case "share_fire":
+            outcomeText = "You share your fire with others. With your skills and values, you spread warmth.";
+            break;
+        case "comfort_kin":
+            outcomeText = "You comfort your grieving kin. Your mere presence helps them get through their sorrow more easily.";
+            break;
+        case "ignore_kin":
+            outcomeText = "You ignore a kin when they need you. This creates distance between you two.";
+            break;
+        case "mock_kin":
+            outcomeText = "You mock another kin in front of others. You find it funny but they feel you broke their trust.";
+            break;
+        case "exploit_kin":
+            outcomeText = "You take advantage of your kin. This creates resentment where love could have grown.";
+            break;
+        case "listen_kin":
+            outcomeText = "You listen to your kin without interrupting. This makes them feel heard and seen.";
+            break;
+        case "protect_kin":
+            outcomeText = "You protect your kin from a threat. They will do the same for you when the time comes.";
+            break;
+        case "gossip_kin":
+            outcomeText = "You let yourself gossip about your kin with others. This seemingly menial action deteriorates your bond.";
+            break;
+        case "teach_word":
+            outcomeText = "You teach a meaningful lesson which will help your community grow their skillset.";
+            break;
+        case "share_story":
+            outcomeText = "You create a memorable experience for your kin by sharing folklore at the end of the day.";
+            break;
+        case "create_signal":
+            outcomeText = "You use your intellect to devise better communication strategies, this makes cooperation easier within your kin.";
+            break;
+        case "withhold_info":
+            outcomeText = "You stay silent about a useful piece of information. This creates confusion which could have been avoided.";
+            break;
+        case "spread_rumor":
+            outcomeText = "You spread a rumor about a kin. This affects trust between members of your kin.";
+            break;
+        case "distort_lie":
+            outcomeText = "You knowingly cause confusion by twisting meaning of some info. This causes tension and fear within your kin.";
+            break;
+        case "ridicule_speech":
+            outcomeText = "You ridicule how someone speaks. They withdraw; others become more cautious about their own words.";
+            break;
+        case "mediate_dispute":
+            outcomeText = "You gently mediate a dispute between two people, helping calm the tension in your community.";
+            break;
+        case "shun_outsider":
+            outcomeText = "You do not welcome an outsider into your group. Your group does not approve of your aloof behaviour.";
+            break;
+
+        // Meaning
+        case "keep_ritual":
+            outcomeText = "You engage in a shared ritual. This creates a sense of comfort and relaxation within the group.";
+            break;
+        case "break_ritual":
+            outcomeText = "You deliberately interrupt a ritual. This leaves others confused and uncertain.";
+            break;
+        case "offer_gift":
+            outcomeText = "You leave a common space better than you found it, giving rise to prosperity and positivity for the next visitor.";
+            break;
+        case "hoard_offering":
+            outcomeText = "You go back on a promise. Your reliability amongst your kin is questioned.";
+            break;
+        case "contemplate_mortality":
+            outcomeText = "You lay idle thinking about your own existence, the world looks more vivid.";
+            break;
+        case "create_art_symbol":
+            outcomeText = "You carve or paint a symbol that feels important. Others pause when they walk past it.";
+            break;
+        case "desecrate_sacred_place":
+            outcomeText = "You damage a place others treat as sacred. You disrespected something important and meaningful to your kin.";
+            break;
+        case "reflect_on_choice":
+            outcomeText = "You replay recent choices in your mind, noticing the small places where you could have done otherwise.";
+            break;
+        case "numb_out":
+            outcomeText = "You distract yourself until feeling fades. You let yourself lay idle as the day sets.";
+            break;
+
+        default:
+            outcomeText = "You make your choice and the day shifts around you.";
+    }
+
+    writeTerminal(`You chose: ${action.label}`, false);
+    writeTerminal("→ " + outcomeText, false);
+
+    updateKarmaLuckUnluck(action);
+
+    const lines = [];
+    lines.push(`Last action: ${action.label} (${action.moral})`);
+    lines.push(`Valence v = ${action.v.toFixed(2)}, Effort e = ${action.effort.toFixed(2)}`);
+    lines.push("");
+    lines.push("Karma update:");
+    lines.push(`  K_old = ${K_before.toFixed(2)}`);
+    lines.push("  K_new = 0.9 * K_old + 0.6 * (v * (1 + 0.5 * e))");
+    const k_contrib = action.v * (1 + 0.5 * action.effort);
+    const k_new = 0.9 * K_before + 0.6 * k_contrib;
+    lines.push(`        = 0.9 * ${K_before.toFixed(2)} + 0.6 * (${k_contrib.toFixed(2)}) ≈ ${k_new.toFixed(2)}`);
+    lines.push("");
+    lines.push("Luck / Unluck update:");
+    lines.push(`  L_old = ${L_before.toFixed(2)}, L_new ≈ ${state.luck.toFixed(2)}`);
+    lines.push(`  U_old = ${U_before.toFixed(2)}, U_new ≈ ${state.unluck.toFixed(2)}`);
+    if (probs.length > 0 && state.currentActions.length === probs.length) {
+        lines.push("");
+        lines.push("Odds of each action this turn (used for ADO):");
+        for (let i = 0; i < state.currentActions.length; i++) {
+            const a = state.currentActions[i];
+            const p = probs[i];
+            lines.push(`  - ${a.label}: p ≈ ${p.toFixed(2)}`);
+        }
+        lines.push(`ADO this turn (normalized entropy) ≈ ${ado_before.toFixed(2)}`);
+    }
+
+    state.lastDebug = lines.join("\n");
+
+    updateMeters();
+
+    if (state.turn >= MAX_TURNS) {
+        finishSim();
+    } else {
+        renderTurn(false);
+    }
+}
+
+function finishSim() {
+    state.finished = true;
+    let avgAdo = 0.0;
+    if (state.log.length > 0) {
+        avgAdo = state.log.reduce((acc, e) => acc + e.ado, 0) / state.log.length;
+    }
+
+    writeTerminal("\n--- Simulation complete ---", false);
+    writeTerminal(
+        `Final Karma: ${state.karma.toFixed(2)}\n` +
+        `Average ADO: ${avgAdo.toFixed(2)}\n` +
+        `Final Luck: ${state.luck.toFixed(2)}, Final Unluck: ${state.unluck.toFixed(2)}`,
+        false
+    );
+
+    if (state.mode === "det") {
+        writeTerminal(
+            "In this deterministic run, each step had only one available option.\n" +
+            "ADO remained ~0: on this model, you never genuinely could have done otherwise.",
+            false
+        );
+    } else if (state.mode === "indet") {
+        writeTerminal(
+            "In this indeterministic run, randomness shaped what happened around you more than your moral record did.\n" +
+            "Your Karma did not systematically change your future options or freedom, even though your choices were recorded.",
+            false
+        );
+    } else {
+        writeTerminal(
+            "In this relational compatibilist run, your actions (and simple feedback from others)\n" +
+            "subtly influenced your later options and freedom of choice.",
+            false
+        );
+    }
+
+    document.getElementById("actions").innerHTML = "";
+    updateMeters();
+}
+
+function randn(mean, std) {
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    return mean + std * z;
+}
+
+function startSim() {
+    const modeSelect = document.getElementById("mode-select");
+    const mode = modeSelect.value;
+    initState(mode);
+    // Let renderTurn handle the intro; avoid double-printing introText
+    renderTurn(true);
+}
+
+document.getElementById("start-btn").addEventListener("click", startSim);
+
+const debugToggle = document.getElementById("debug-toggle");
+debugToggle.addEventListener("change", (e) => {
+    state.debug = e.target.checked;
+    const panel = document.getElementById("debug-panel");
+    panel.style.display = state.debug ? "block" : "none";
+    if (state.debug) {
+        panel.innerText = state.lastDebug || "No action taken yet.";
+    }
+});
+
+writeTerminal("Select a mode and press 'Start / Restart' to begin.", true);
+updateMeters();
+
+window.onAction = onAction;
+</script>
+
+
+</body>
+</html>
